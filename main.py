@@ -118,7 +118,7 @@ class ShapeUtil:
 		try:
 			key_idx = self.field_keys.index(key)
 		except ValueError:
-			print(f'Key "{key}" does not exist in shape data; possible keys are: {self.field_keys}')
+			print(f'Key "{key}" not found; possible keys: {self.field_keys}')
 			return shape_indices
 
 		for i,shape in enumerate(self.shapes):
@@ -132,7 +132,7 @@ def extrude(vtx, tri, exterior_vtx_idx, seal=True):
 	'''
 	Return vertex and triangle data required to extrude a planar mesh with
 	the specified peripheral points into 3d wedge.
-	Note: no z coords are added to the vertices! The data returned is therefore
+	Note: no z coords are added to the vertices! Returned data is therefore
 	still planar until the user adds z coords to the vertices!
 	'''
 
@@ -187,16 +187,16 @@ if len(sys.argv) < 2:
 	print(f'  python3 {sys.argv[0]} SHAPEFile prefix [key=val] [delta z]')
 	print('')
 	print('Where:')
-	print('  SHAPEFile : path prefix to SHAPEFile data (don\'t include the file suffix!)')
-	print('  key=val   : shape selector (if unspecified, list shapes in file then exit)')
+	print('  SHAPEFile : path prefix to SHAPEFile data (no file suffix!)')
+	print('  key=val : shape selector (if unspecified, list shapes in file)')
 	print('  delta z   : extrusion height on z axis (default: 1.0)')
 	print('')
 	print('Example:')
 	print(f'  python3 {sys.argv[0]} my_data/my_shapefile blah=eek 0.25')
 	print('')
-	print('  This looks for the shape in the my_data/my_shapefile.(dbf,shp,shx) file')
-	print('  combination filtered using whichever record key "blah" has key "eek",')
-	print('  and extrudes it into a 3d model of "height" 0.25 units. The output is')
+	print('  Look for a shape in my_data/my_shapefile.(dbf,shp,shx) file')
+	print('  combination filtered using record key "blah" = value "eek",')
+	print('  and extrude into a 3d model of "height" 0.25 units. Output is')
 	print('  written to an "output.obj" file.')
 	print('')
 	sys.exit(-1)
@@ -238,7 +238,7 @@ shape = su.shapes[shape_idx]
 parts, points = shape.parts, shape.points
 
 #
-# Shapes can "close" via copyig 1st point as final point; remove if so
+# Shapes can "close" via copying 1st point as final point; remove if so
 #
 
 if points[0] == points[-1]: points = points[:-1]
@@ -258,8 +258,8 @@ if True:
 	segments.append( [N-1,0] )
 
 	A = dict(vertices=points, segments=segments)
-#	B = tr.triangulate(A, 'p' )  # p = no new vertices, just use existing
-	B = tr.triangulate(A, 'pq' ) # pq = quality control on angles; "better" mesh
+#	B = tr.triangulate(A, 'p' )  # p: no new vertices, just use existing
+	B = tr.triangulate(A, 'pq' ) # pq: quality control for "better" mesh
 
 	# Plot results?	
 	if plot_shapes == True:
