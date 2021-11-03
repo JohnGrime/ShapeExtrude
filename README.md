@@ -10,13 +10,35 @@ This script requires Python3, and the ``shapefile`` (from ``pyshp``) and ``trian
 
 ## Example usage
 
-Assuming the presence of the [Oklahoma Dept of Transport's counrty boundaries data set](https://www.odot.org/hqdiv/p-r-div/maps/shp-files/) in the subdirectory ``counties``, we may extract the boundary shape data for e.g. Logan county and extrude as follows:
+Running the script with no arguments prints a brief usage outline:
 
 ```
-python3 main.py county/COUNTY_BOUNDARY LOGAN 0.1
+$ python3 main.py
+
+Usage:
+  python3 main.py SHAPEFile prefix [key=val] [delta z]
+
+Where:
+  SHAPEFile : path prefix to SHAPEFile data (don't include the file suffix!)
+  key=val   : shape selector (if unspecified, list shapes in file then exit)
+  delta z   : extrusion height on z axis (default: 1.0)
+
+Example:
+  python3 main.py my_data/my_shapefile blah=eek 0.25
+
+  This looks for the shape in the my_data/my_shapefile.(dbf,shp,shx) file
+  combination filtered using whichever record key "blah" has key "eek",
+  and extrudes it into a 3d model of "height" 0.25 units. The output is
+  written to an "output.obj" file.
 ```
 
-Here, we specify an extrusion length on the z-axis of ``0.1`` rather than the default ``1.0`` units. Note that the shape name is case sensitive; using ``logan`` rather than ``LOGAN`` will not work. This command results on the following output:
+Assuming the presence of the [Oklahoma Dept of Transport's county boundaries data set](https://www.odot.org/hqdiv/p-r-div/maps/shp-files/) in the subdirectory ``counties``, we may extract the boundary shape data for e.g. Logan county and extrude as follows:
+
+```
+python3 main.py county/COUNTY_BOUNDARY COUNTY_NAM=LOGAN 0.1
+```
+
+Here, we specify an extrusion length on the z-axis of ``0.1`` rather than the default ``1.0`` units. Note that the key,val data is case sensitive; using ``county_nam=logan`` rather than ``COUNTY_NAM=LOGAN`` will not work. This command results on the following output:
 
 ```
 $ python3 main.py county/COUNTY_BOUNDARY LOGAN 0.1

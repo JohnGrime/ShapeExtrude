@@ -174,7 +174,6 @@ def extrude(vtx, tri, exterior_vtx_idx, seal=True):
 # the "triangle" library!
 #
 
-county_key = 'COUNTY_NAM'
 min_dr = 1e-6
 plot_shapes = False
 
@@ -185,25 +184,29 @@ plot_shapes = False
 if len(sys.argv) < 2:
 	print('')
 	print('Usage:')
-	print(f'  python3 {sys.argv[0]} SHAPEFile prefix [shape name] [delta z]')
+	print(f'  python3 {sys.argv[0]} SHAPEFile prefix [key=val] [delta z]')
 	print('')
 	print('Where:')
-	print('  SHAPEFile  : path prefix to SHAPEFile data (don\'t include the file suffix!)')
-	print('  shape name : name of shape in file (if unspecified, shapes in file listen then exit)')
-	print('  delta z    : extrusion height on z axis (default: 1.0)')
+	print('  SHAPEFile : path prefix to SHAPEFile data (don\'t include the file suffix!)')
+	print('  key=val   : shape selector (if unspecified, list shapes in file then exit)')
+	print('  delta z   : extrusion height on z axis (default: 1.0)')
 	print('')
 	print('Example:')
-	print(f'  python3 {sys.argv[0]} my_data/my_shapefile blah 0.25')
+	print(f'  python3 {sys.argv[0]} my_data/my_shapefile blah=eek 0.25')
 	print('')
-	print('  This looks for the "blah" shape in the my_data/my_shapefile.(dbf,shp,shx) file')
-	print('  combination, and extrudes it into a 3d model of "height" 0.25 units. The output')
-	print('  is written to an "output.obj" file.')
+	print('  This looks for the shape in the my_data/my_shapefile.(dbf,shp,shx) file')
+	print('  combination filtered using whichever record key "blah" has key "eek",')
+	print('  and extrudes it into a 3d model of "height" 0.25 units. The output is')
+	print('  written to an "output.obj" file.')
 	print('')
 	sys.exit(-1)
 
 fprefix = sys.argv[1]
-shape_name = sys.argv[2] if (len(sys.argv)>2) else None
+shape_keyval = sys.argv[2] if (len(sys.argv)>2) else None
 dz = float(sys.argv[3]) if (len(sys.argv)>3) else 1.0
+
+if shape_keyval != None:
+	shape_key, shape_val = shape_keyval.split('=')[0:2]
 
 #
 # Load shape data from file
@@ -212,37 +215,29 @@ dz = float(sys.argv[3]) if (len(sys.argv)>3) else 1.0
 su = ShapeUtil(fprefix,min_dr=min_dr)
 
 #
-# If no target county name specified, print the shape data and exit.
+# If no target filter key/val specified, print the shape data and exit.
 #
 
-if shape_name == None:
-	# check we have the appropriate county name field
-	try:
-		_ = su.field_keys.index(county_key)
-	except:
-		print(f'Unable to find data under field key "{county_key}" for input file!')
-		sys.exit(-1)
-
+if shape_keyval == None:
 	for i,s in enumerate(su.shapes):
 		rec = su.shapefile.record(i)
 		print( ' '.join([f'{k}={rec[k]}' for k in su.field_keys]) )
-	
 	sys.exit(0)
 
 #
 # Get specific county data
 #
 
-shape_indices = su.get_shape_indices(key=county_key,vals=[shape_name])
+shape_indices = su.get_shape_indices(key=shape_key,vals=[shape_val])
 if len(shape_indices) < 1:
-	print(f'Unable to find shape "{shape_name}"')
+	print(f'Unable to find shape using "{shape_key}={shape_val}"')
 	sys.exit(-1)
 
 shape_idx = shape_indices[0]
 shape = su.shapes[shape_idx]
 parts, points = shape.parts, shape.points
 
-print(f'{shape_name} ({shape_idx}): {len(parts)} parts, {len(points)} points')
+print(f'{shape_key}={shape_val} ({shape_idx}): {len(parts)} parts, {len(points)} points')
 
 #
 # Break up longer line sections so they do not exceed 2 x min_dr? This is now
