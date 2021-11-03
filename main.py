@@ -237,40 +237,18 @@ shape_idx = shape_indices[0]
 shape = su.shapes[shape_idx]
 parts, points = shape.parts, shape.points
 
-print(f'{shape_key}={shape_val} ({shape_idx}): {len(parts)} parts, {len(points)} points')
-
 #
-# Break up longer line sections so they do not exceed 2 x min_dr? This is now
-# redundant, instead we specify triangle quality params for "triangle" library
+# Shapes can "close" via copyig 1st point as final point; remove if so
 #
 
-if False:
-	N = len(points)
-	vtx = [ [x,y] for x,y in points[:1] ]
-	max_dr = min_dr*2
-
-	for i in range(1,N):
-		v0, v1 = points[i-1], points[i]
-		[dx, dy], dz = [v1[j]-v0[j] for j in (0,1)], 0
-		dr = math.sqrt(dx*dx + dy*dy + dz*dz)
-		if dr > max_dr:
-			n = int( math.floor(dr/max_dr) )
-			for j in range(n):
-				vtx.append( [v0[0]+(dx/n)*(j+1),v0[1]+(dy/n)*(j+1)] )
-		vtx.append(v1)
-
-	points = vtx
+if points[0] == points[-1]: points = points[:-1]
 
 #
 # While the triangle library can add new points etc depending on the arguments,
 # it does seems to preserve the initial vertex data order. This means we should
-# be able to assume the *initial* N points will all remain on the boundary.
+# be able to assume the *initial* N points will all remain as boundary points.
 #
 
-# Shapes can "close" via copyig 1st point as final point; remove if so
-if points[0] == points[-1]: points = points[:-1]
-
-# All N initial points are assumed to define the shape boundary.
 N = len(points)
 vtx, tri = points, []
 
@@ -296,11 +274,17 @@ print(f'{Nv1} input vtx; {Nv2} output vtx; {Nt} output tri')
 
 vtx_, tri_ = extrude(vtx, tri, [i for i in range(N)])
 
+#
 # Note: vertices are all 2D at this stage, so add z coords
+#
+
 all_vtx = [[x,y,-dz/2] for x,y in vtx] + [[x,y,+dz/2] for x,y in vtx_]
 all_tri = [[k,j,i] for i,j,k in tri] + [[i,j,k] for i,j,k in tri_]
 
+#
 # Write simple Wavefront .obj file
+#
+
 with open('output.obj','w') as f:
 	for v in all_vtx:  print(f'v {v[0]} {v[1]} {v[2]}', file=f)	
 	for t in all_tri:  print(f'f {t[0]+1} {t[1]+1} {t[2]+1}', file=f)
