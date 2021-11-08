@@ -27,6 +27,20 @@ import shapefile
 import triangle as tr
 
 #
+# "min_dr" : used to simplify shape data via min point separation; also used to
+#            remove adjacent duplicate points, which can crash the "triangle"
+#            library!
+# "plot_shapes" : if true, use matplotlib to show the user some graphical data
+# "shape_keyval" : specifies how to identify/extract user-specified shape data
+# "dz" : "height" of the extruded shape, in whatever units the shape file uses
+#
+
+min_dr = 1e-6
+plot_shapes = False
+shape_keyval = None
+dz = 1.0
+
+#
 # Simple utility class to load th shape data and simplify it.
 #
 
@@ -167,16 +181,6 @@ def extrude(vtx, tri, exterior_vtx_idx, seal=True):
 
 	return vtx_, tri_
 
-
-#
-# Simplify shape data via min point separation.
-# Also used to remove adjacent duplicate points, which can crash
-# the "triangle" library!
-#
-
-min_dr = 1e-6
-plot_shapes = False
-
 #
 # Get user parameters
 #
@@ -202,8 +206,8 @@ if len(sys.argv) < 2:
 	sys.exit(-1)
 
 fprefix = sys.argv[1]
-shape_keyval = sys.argv[2] if (len(sys.argv)>2) else None
-dz = float(sys.argv[3]) if (len(sys.argv)>3) else 1.0
+if len(sys.argv) > 2: shape_keyval = sys.argv[2]
+if len(sys.argv) > 3: dz = float(sys.argv[3])
 
 if shape_keyval != None:
 	shape_key, shape_val = shape_keyval.split('=')[0:2]
@@ -285,6 +289,7 @@ all_tri = [[k,j,i] for i,j,k in tri] + [[i,j,k] for i,j,k in tri_]
 # Write simple Wavefront .obj file
 #
 
+dp = 6
 with open('output.obj','w') as f:
-	for v in all_vtx:  print(f'v {v[0]} {v[1]} {v[2]}', file=f)	
+	for v in all_vtx:  print(f'v {v[0]:.{dp}f} {v[1]:.{dp}f} {v[2]:.{dp}f}', file=f)
 	for t in all_tri:  print(f'f {t[0]+1} {t[1]+1} {t[2]+1}', file=f)
