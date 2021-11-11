@@ -324,3 +324,195 @@ COUNTY_FIP=135 COUNTY_NO=68 MAINTENANC=1 COUNTY_NAM=SEQUOYAH ADT_FACTOR=1.02 MAI
 COUNTY_FIP=137 COUNTY_NO=69 MAINTENANC=7 COUNTY_NAM=STEPHENS ADT_FACTOR=1.02 MAIN_DISTR=725 PHONE_NO_B= DESC_LOCAT= MSLINK=69.0 MAPID=101483.0 LOGIN=upln038 CREATION_D=1999-07-23 CNTY_SEAT_=725 MUNICIPAL_=21900.0
 COUNTY_FIP=141 COUNTY_NO=71 MAINTENANC=5 COUNTY_NAM=TILLMAN ADT_FACTOR=1.01 MAIN_DISTR=895 PHONE_NO_B=(405) 335-5218 DESC_LOCAT= MSLINK=71.0 MAPID=101485.0 LOGIN=upln038 CREATION_D=1999-07-23 CNTY_SEAT_=895 MUNICIPAL_=27800.0
 ```
+
+## Worked example
+
+Assuming the presence of the U.S. Census [state boundary shapefiles](https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html) in the subdirectory ``cb_2018_us_state_500k``, and the Oklahoma Dept. of Transport's [county boundaries shapefiles](https://www.odot.org/hqdiv/p-r-div/maps/shp-files/) in the subdirectory ``counties``, we can superpose e.g. a 3D model of Logan county onto a slightly thinner 3D model of the state of Oklahoma:
+
+First, a 3D model of the state of Oklahoma is generated using the keyval filter ``NAME=Oklahoma`` with a width of 0.01 units:
+
+```
+$ python3 main.py cb_2018_us_state_500k/cb_2018_us_state_500k NAME=Oklahoma 0.01
+
+56 shapes total. Fields:
+   ('DeletionFlag', 'C', 1, 0)
+   ['STATEFP', 'C', 2, 0]
+   ['STATENS', 'C', 8, 0]
+   ['AFFGEOID', 'C', 11, 0]
+   ['GEOID', 'C', 2, 0]
+   ['STUSPS', 'C', 2, 0]
+   ['NAME', 'C', 100, 0]
+   ['LSAD', 'C', 2, 0]
+   ['ALAND', 'N', 14, 0]
+   ['AWATER', 'N', 14, 0]
+
+Simplifying shapes with min_dr = 1e-06:
+      0 :     8   2849 =>     8   2849
+      1 :    13   5500 =>    13   5493
+      2 :     1   2642 =>     1   2642
+      3 :    11   5989 =>    11   5987
+      4 :     1   3880 =>     1   3876
+      5 :    46   5606 =>    46   5605
+      6 :   111  13734 =>   111  13726
+      7 :    33   2579 =>    33   2579
+      8 :     1   3261 =>     1   3261
+      9 :   116   7866 =>   116   7863
+     10 :     1   1978 =>     1   1975
+     11 :    58   6890 =>    58   6887
+     12 :     1    696 =>     1    696
+     13 :    14   2414 =>    14   2413
+     14 :     1   1751 =>     1   1748
+     15 :    31  12959 =>    31  12956
+     16 :    13   5077 =>    13   5073
+     17 :     7   1909 =>     7   1906
+     18 :     2   3034 =>     2   3030
+     19 :     1   1813 =>     1   1813
+     20 :     1   3025 =>     1   3024
+     21 :     1    500 =>     1    500
+     22 :     1    433 =>     1    433
+     23 :     1   2269 =>     1   2267
+     24 :     1    427 =>     1    427
+     25 :    18   4209 =>    18   4203
+     26 :     1   1488 =>     1   1485
+     27 :   588 116646 =>   588 116638
+     28 :     1    753 =>     1    753
+     29 :     1   3098 =>     1   3096
+     30 :     1   1634 =>     1   1634
+     31 :     1   2626 =>     1   2626
+     32 :     1   2639 =>     1   2639
+     33 :     4   2704 =>     4   2703
+     34 :     4   1849 =>     4   1849
+     35 :     1   1414 =>     1   1414
+     36 :     1    217 =>     1    216
+     37 :     9   1017 =>     9   1017
+     38 :    22   2874 =>    22   2869
+     39 :     1   1564 =>     1   1563
+     40 :    18   7474 =>    18   7472
+     41 :   207   7348 =>   207   7347
+     42 :    28   2683 =>    28   2683
+     43 :     4    535 =>     4    535
+     44 :     3    660 =>     3    659
+     45 :    17   2000 =>    17   2000
+     46 :    13   1242 =>    13   1242
+     47 :     2   3154 =>     2   3153
+     48 :    12   3197 =>    12   3191
+     49 :    27   5363 =>    27   5359
+     50 :     8   2107 =>     8   2107
+     51 :     1   3217 =>     1   3216
+     52 :     1   2486 =>     1   2486
+     53 :     1   2190 =>     1   2187
+     54 :     5   6042 =>     5   6040
+     55 :    10   1046 =>    10   1046
+
+2641 input vtx; 6646 output vtx; 9670 output tri
+```
+
+We should now rename the output file (``output.obj``) to prevent the following command overwriting it!
+
+Next, we generate a 3D model of Logan county using the keyval filter ``COUNTY_NAM=LOGAN`` with a width of 0.1 units:
+
+```
+$ python3 main.py county/COUNTY_BOUNDARY COUNTY_NAM=LOGAN 0.1
+
+77 shapes total. Fields:
+   ('DeletionFlag', 'C', 1, 0)
+   ['COUNTY_FIP', 'N', 10, 0]
+   ['COUNTY_NO', 'N', 10, 0]
+   ['MAINTENANC', 'N', 10, 0]
+   ['COUNTY_NAM', 'C', 13, 0]
+   ['ADT_FACTOR', 'F', 24, 5]
+   ['MAIN_DISTR', 'N', 10, 0]
+   ['PHONE_NO_B', 'C', 14, 0]
+   ['DESC_LOCAT', 'C', 80, 0]
+   ['MSLINK', 'F', 24, 5]
+   ['MAPID', 'F', 24, 5]
+   ['LOGIN', 'C', 8, 0]
+   ['CREATION_D', 'D', 8, 0]
+   ['CNTY_SEAT_', 'N', 10, 0]
+   ['MUNICIPAL_', 'F', 24, 5]
+
+Simplifying shapes with min_dr = 1e-06:
+      0 :     1    232 =>     1    232
+      1 :     1    634 =>     1    633
+      2 :     1    580 =>     1    579
+      3 :     1    390 =>     1    389
+      4 :     1    458 =>     1    458
+      5 :     1    638 =>     1    638
+      6 :     1    699 =>     1    699
+      7 :     1     84 =>     1     83
+      8 :     1    142 =>     1    141
+      9 :     1    223 =>     1    223
+     10 :     1    243 =>     1    231
+     11 :     1   5263 =>     1   5261
+     12 :     1    312 =>     1    300
+     13 :     1    271 =>     1    271
+     14 :     1   2980 =>     1   2978
+     15 :     1    493 =>     1    491
+     16 :     1    241 =>     1    240
+     17 :     1    307 =>     1    305
+     18 :     1    744 =>     1    743
+     19 :     1   1529 =>     1   1529
+     20 :     1    497 =>     1    496
+     21 :     1    411 =>     1    409
+     22 :     1   1219 =>     1   1219
+     23 :     1    995 =>     1    994
+     24 :     1   3029 =>     1   3025
+     25 :     1    289 =>     1    289
+     26 :     1   1983 =>     1   1982
+     27 :     1    698 =>     1    698
+     28 :     1    257 =>     1    257
+     29 :     1   1264 =>     1   1263
+     30 :     1    661 =>     1    659
+     31 :     1    677 =>     1    675
+     32 :     1    612 =>     1    612
+     33 :     1    148 =>     1    148
+     34 :     1   1131 =>     1   1127
+     35 :     1    568 =>     1    568
+     36 :     1    269 =>     1    269
+     37 :     1   1733 =>     1   1729
+     38 :     1    569 =>     1    568
+     39 :     1    615 =>     1    615
+     40 :     1    573 =>     1    573
+     41 :     1    360 =>     1    360
+     42 :     1    969 =>     1    969
+     43 :     1    101 =>     1    101
+     44 :     1    142 =>     1    141
+     45 :     1     98 =>     1     97
+     46 :     1    143 =>     1    143
+     47 :     1    265 =>     1    265
+     48 :     1    314 =>     1    314
+     49 :     1    153 =>     1    153
+     50 :     1    764 =>     1    764
+     51 :     1    448 =>     1    448
+     52 :     1   2246 =>     1   2246
+     53 :     1    494 =>     1    493
+     54 :     1    185 =>     1    185
+     55 :     1    634 =>     1    633
+     56 :     1    179 =>     1    179
+     57 :     1    152 =>     1    152
+     58 :     1    420 =>     1    419
+     59 :     1    129 =>     1    128
+     60 :     1    115 =>     1    115
+     61 :     1    932 =>     1    932
+     62 :     1    133 =>     1    132
+     63 :     1    159 =>     1    158
+     64 :     1    198 =>     1    196
+     65 :     1    114 =>     1    114
+     66 :     1    657 =>     1    656
+     67 :     1    112 =>     1    112
+     68 :     1    153 =>     1    153
+     69 :     1    115 =>     1    114
+     70 :     1    998 =>     1    996
+     71 :     1    236 =>     1    236
+     72 :     1    405 =>     1    403
+     73 :     1    169 =>     1    169
+     74 :     1    627 =>     1    627
+     75 :     1     86 =>     1     86
+     76 :     1   1525 =>     1   1524
+
+408 input vtx; 793 output vtx; 1127 output tri
+```
+
+When visualized in [MeshLab](https://www.meshlab.net), these models look like this:
+
+![Picture of the two models](./pictures/models.png)

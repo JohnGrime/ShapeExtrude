@@ -12,6 +12,15 @@
 # and so some form of simplification (even with very small tolerances) is
 # usually enough to remove those issues.
 #
+# Example:
+#
+# Assuming the presence of the Oklahoma Dept of Transport's county boundaries
+# data set (https://www.odot.org/hqdiv/p-r-div/maps/shp-files/) in the subdir
+# "counties", we may extract the boundary shape data for e.g. Logan county and
+# extrude into a 3d .obj file ("output.obj") as follows:
+#
+# python3 main.py county/COUNTY_BOUNDARY COUNTY_NAM=LOGAN 0.01
+#
 
 import math, sys
 
