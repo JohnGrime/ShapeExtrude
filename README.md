@@ -8,7 +8,7 @@ This script requires Python3, and the ``shapefile`` (from ``pyshp``) and ``trian
 
 ``pip3 install shapefile triangle matplotlib``
 
-## Example usage
+## Example 1
 
 Running the script with no arguments prints a brief usage outline:
 
@@ -325,7 +325,7 @@ COUNTY_FIP=137 COUNTY_NO=69 MAINTENANC=7 COUNTY_NAM=STEPHENS ADT_FACTOR=1.02 MAI
 COUNTY_FIP=141 COUNTY_NO=71 MAINTENANC=5 COUNTY_NAM=TILLMAN ADT_FACTOR=1.01 MAIN_DISTR=895 PHONE_NO_B=(405) 335-5218 DESC_LOCAT= MSLINK=71.0 MAPID=101485.0 LOGIN=upln038 CREATION_D=1999-07-23 CNTY_SEAT_=895 MUNICIPAL_=27800.0
 ```
 
-## Worked example
+## Example 2
 
 Assuming the presence of the U.S. Census [state boundary shapefiles](https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html) in the subdirectory ``cb_2018_us_state_500k``, and the Oklahoma Dept. of Transport's [county boundaries shapefiles](https://www.odot.org/hqdiv/p-r-div/maps/shp-files/) in the subdirectory ``counties``, we can superpose e.g. a 3D model of Logan county onto a slightly thinner 3D model of the state of Oklahoma:
 
